@@ -11,7 +11,8 @@
 
 class matrix_operations {
     public:
-
+    void inputMatrix(int **matrix, int dim);
+    int generateNum();
 };
 
 

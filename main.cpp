@@ -1,10 +1,29 @@
 #include <iostream>
+#include <iostream>
 #include "matrix_operations.h"
-#include "dynamic_arrays.h"
+#include <iostream>
+#include <string>
+#include <vector>
+#include <sstream>
+#include <unistd.h>
+#include <sys/types.h>
+//#include <sys/wait.h>
+#include <fstream>
+#include <fcntl.h>
+#include <cstring>
+#include <fstream>
+#include <string>
+#include <bits/stdc++.h>
+#include <map>
+#include <array>
+
+#include "matrix_operations.h"
+
+using namespace std;
 
 int main() {
 
-    DynamicArray d;
+
 
 
     /* Create matricies Mat_A & Mat_B (decimals) with dimensions N x N, where N is an arbitrarily large number.
@@ -19,55 +38,38 @@ int main() {
      * [ ] fill each array with randomly generated numbers
      */
 
+    matrix_operations m;
+    int dim;
     int r1, c1, r2, c2;
+    int userInput;
 
-    // Input matrix dimensions
-    cout << "Enter rows and columns for Matrix A: ";
-    cin >> r1 >> c1;
-
-    cout << "Enter rows and columns for Matrix B: ";
-    cin >> r2 >> c2;
-
-    // Check if multiplication is possible
-    if (c1 != r2) {
-        cout << "Matrix multiplication not possible!" << endl;
-        return 1;
+    // get user input into num of rows & columns. weak working solution for now, as input validation not great
+    cout << "How many rows & columns would you like for Matrix A: ";
+    cin >> userInput;
+    if (cin.fail()) {
+        cout << "wasn't an int, exiting process";
+        return 0;
     }
 
-    // Dynamically allocate matrices
-    int** A = new int*[r1];
-    int** B = new int*[r2];
-    int** C = new int*[r1];
+    // Creates arrays for A, B & C
+    int** A = new int*[dim];
+    int** B = new int*[dim];
+    int** C = new int*[dim];
 
-    for (int i = 0; i < r1; i++) {
-        A[i] = new int[c1];
-        C[i] = new int[c2];
+    for (int i = 0; i < dim; i++) {
+        A[i] = new int[dim];
+        C[i] = new int[dim];
+        B[i] = new int[dim];
     }
 
-    for (int i = 0; i < r2; i++) {
-        B[i] = new int[c2];
-    }
-
-
-    // Input Matrix A
-    cout << "Enter elements of Matrix A:\n";
-    for (int i = 0; i < r1; i++) {
-        for (int j = 0; j < c1; j++) {
-            cin >> A[i][j];
-        }
-    }
-
-    // Input Matrix B
-    cout << "Enter elements of Matrix B:\n";
-    for (int i = 0; i < r2; i++) {
-        for (int j = 0; j < c2; j++) {
-            cin >> B[i][j];
-        }
-    }
+    // fill matrix A & B with random integer numbers
+    m.inputMatrix(A, dim);
+    m.inputMatrix(B, dim);
 
     // Initialize result matrix C to 0
-    for (int i = 0; i < r1; i++) {
-        for (int j = 0; j < c2; j++) {
+    // this was generated, not sure if necessary
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
             C[i][j] = 0;
         }
     }
