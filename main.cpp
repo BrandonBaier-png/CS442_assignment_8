@@ -39,7 +39,7 @@ int main() {
      */
 
     matrix_operations m;
-    int dim;
+    int dim = 0;
     int r1, c1, r2, c2;
     int userInput;
 
@@ -50,6 +50,7 @@ int main() {
         cout << "wasn't an int, exiting process";
         return 0;
     }
+    dim = userInput;
 
     // Creates arrays for A, B & C
     int** A = new int*[dim];
@@ -74,10 +75,12 @@ int main() {
         }
     }
 
-    // Matrix multiplication
-    for (int i = 0; i < r1; i++) {
-        for (int j = 0; j < c2; j++) {
-            for (int k = 0; k < c1; k++) {
+    /* Matrix multiplication. This is what is to be multithreadded in one of two ways
+     * Attempting to split the matrix into quadrants & running at the same time in that way.
+     */
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            for (int k = 0; k < dim; k++) {
                 C[i][j] += A[i][k] * B[k][j];
             }
         }
@@ -85,19 +88,19 @@ int main() {
 
     // Output result
     cout << "Resultant Matrix C:\n";
-    for (int i = 0; i < r1; i++) {
-        for (int j = 0; j < c2; j++) {
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
             cout << C[i][j] << " ";
         }
         cout << endl;
     }
 
     // Free allocated memory
-    for (int i = 0; i < r1; i++) {
+    for (int i = 0; i < dim; i++) {
         delete[] A[i];
         delete[] C[i];
     }
-    for (int i = 0; i < r2; i++) {
+    for (int i = 0; i < dim; i++) {
         delete[] B[i];
     }
 
