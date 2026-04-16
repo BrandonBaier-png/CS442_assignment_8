@@ -17,17 +17,19 @@
 #include <map>
 #include <array>
 #include <vector>
+#include <chrono>
 
 #include "matrix_operations.h"
 
 using namespace std;
-
+using namespace std::chrono; // for the   high_resolution_clock
 
 
 int dim = 0;
 vector<vector<unsigned long long int>> matrixA;
 vector<vector<unsigned long long int>> matrixB;
-vector<vector<unsigned long long int>> matrixC;
+vector<vector<unsigned long long int>> matrixC; // Sequential
+vector<vector<unsigned long long int>> matrixD; // Parallel Multithread
 
 // Constructs the vector matrices
 // Code from matrix addition example
@@ -36,6 +38,36 @@ void constructMatricies(int dim) {
         matrixA.push_back(vector<unsigned long long int>(dim));
         matrixB.push_back(vector<unsigned long long int>(dim));
         matrixC.push_back(vector<unsigned long long int>(dim));
+        matrixD.push_back(vector<unsigned long long int>(dim));
+    }
+}
+
+/* sequentially carries out matrix multiplication
+ * Modification of matrix C to accomplish this
+ */
+void sequential_Matrix_Multiplication() {
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            for (int k = 0; k < dim; k++) {
+                matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
+            }
+        }
+    }
+}
+
+
+
+/* matrix multiplies based on the chunk given via "start" and "end" variables in first column
+ * to be run in parallel to other threads containing this function
+ * modification of matrix D to accomplish this,
+*/
+void parallel_Matrix_Multiplication(int start, int end) {
+    for (int i = start; i < end; i++) {
+        for (int j = 0; j < dim; j++) {
+            for (int k = 0; k < dim; k++) {
+                matrixD[i][j] += matrixA[i][k] * matrixB[k][j];
+            }
+        }
     }
 }
 
@@ -66,19 +98,19 @@ int main() {
     }
     dim = userInput;
     constructMatricies(dim);
-    
+
 
     // fills vectors with junk values
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
-            matrixA[i][j] = rand() % 101;
-            matrixB[i][j] = rand() % 101;
+            matrixA[i][j] = rand() % 11;
+            matrixB[i][j] = rand() % 11;
         }
     }
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
-            if (matrixA[i][j] > 100 || matrixA[i][j] < 0) return 1;
-            if (matrixB[i][j] > 100 || matrixB[i][j] < 0) return 1;
+            if (matrixA[i][j] > 10 || matrixA[i][j] < 0) return 1;
+            if (matrixB[i][j] > 10 || matrixB[i][j] < 0) return 1;
         }
     }
 
@@ -93,25 +125,67 @@ int main() {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
             matrixC[i][j] = 0;
+            matrixD[i][j] = 0;
         }
     }
 
     /* Matrix multiplication. This is what is to be multithreadded in one of two ways
      * Attempting to split the matrix into quadrants & running at the same time in that way.
      */
-    for (int i = 0; i < dim; i++) {
-        for (int j = 0; j < dim; j++) {
-            for (int k = 0; k < dim; k++) {
-                matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
-            }
-        }
-    }
-    cout << "output matrix A" << endl;
-    m.outputMatrix(matrixA, dim);
-    cout << "output matrix B" << endl;
-    m.outputMatrix(matrixB, dim);
-    cout << "output matrix C" << endl;
-    m.outputMatrix(matrixC, dim);
+    // currently sequential only
+
+    cout << "Start Sequential Operation " << endl;
+    auto start = high_resolution_clock::now();
+
+    sequential_Matrix_Multiplication();
+
+    auto stop = high_resolution_clock::now();
+    auto duration = duration_cast<microseconds>(stop - start);
+    cout << "Sequential time: " << duration.count() << endl;
+
+
+    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF SEQUENTIAL $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+    // Multithreading
+
+    int numThreads = 4;
+    cout << "Start Parallel Operation Using std::theard" << endl;
+    start = high_resolution_clock::now();
+    //creating threads and dividing the workload
+
+    /* Splitting the size into 4 parts
+     *
+     */
+
+    int workload = dim / 4;
+    int dim1 = workload;
+    int dim2 = workload * 2;
+    int dim3 = workload * 3;
+    int dim4 = dim - 1;
+
+    thread th1(parallel_Matrix_Multiplication, 0, dim1);
+    thread th2(parallel_Matrix_Multiplication, (dim1 + 1), dim2);
+    thread th3(parallel_Matrix_Multiplication, (dim2 + 1), dim3);
+    thread th4(parallel_Matrix_Multiplication, (dim3 + 1), dim4);
+
+    th1.join();
+    th2.join();
+    th3.join();
+    th4.join();
+
+    stop = high_resolution_clock::now();
+    duration = duration_cast<microseconds>(stop - start);
+    cout << "Parallel time in microseconds: " << duration.count() << endl;
+
+
+    // $$$$$$$$$$$$$$$$$$$$$$$$$$$$ END OF MULTITHREADING $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+
+    // cout << "output matrix A" << endl;
+    // m.outputMatrix(matrixA, dim);
+    // cout << "output matrix B" << endl;
+    // m.outputMatrix(matrixB, dim);
+    // cout << "output matrix C" << endl;
+    // m.outputMatrix(matrixC, dim);
 
     // Free allocated memory
     // for (int i = 0; i < dim; i++) {
@@ -133,9 +207,6 @@ int main() {
      *
      */
 
-    /* results could be exported into an excel file if possible?? would be considered extra credit if the solution generated and formatted itself.
-     *
-     */
 
     return 0;
 }

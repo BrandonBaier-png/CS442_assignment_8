@@ -35,7 +35,7 @@ void matrix_operations::inputMatrix(int** matrix, int dim) {
 }
 
 // Output result
-void matrix_operations::outputMatrix(vector<vector<unsigned long long int>> matrix, int dim) {
+void matrix_operations::outputMatrix(twodVec matrix, int dim) {
 
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
@@ -45,4 +45,14 @@ void matrix_operations::outputMatrix(vector<vector<unsigned long long int>> matr
     }
 }
 
-// this currently generates whatever it wants, doesn't fully work
+
+twodVec matrix_operations::sequential_Matrix_Multiplication(twodVec matrixA, twodVec matrixB, twodVec matrixC, int dim) {
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            for (int k = 0; k < dim; k++) {
+                matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
+            }
+        }
+    }
+    return matrixC;
+}

@@ -11,12 +11,18 @@
  */
 
 using namespace std;
+typedef vector<vector<unsigned long long int>> twodVec;
 
 class matrix_operations {
     public:
     void inputMatrix(int **matrix, int dim);
 
-    void outputMatrix(vector<vector<unsigned long long int>> matrix, int dim);
+    void outputMatrix(twodVec matrix, int dim);
+
+    twodVec sequential_Matrix_Multiplication(
+        twodVec matrixA,
+        twodVec matrixB,
+        twodVec matrixC, int dim);
 
     int generateNum();
 
