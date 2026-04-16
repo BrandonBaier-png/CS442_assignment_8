@@ -16,15 +16,30 @@
 #include <bits/stdc++.h>
 #include <map>
 #include <array>
+#include <vector>
 
 #include "matrix_operations.h"
 
 using namespace std;
 
+
+
+int dim = 0;
+vector<vector<unsigned long long int>> matrixA;
+vector<vector<unsigned long long int>> matrixB;
+vector<vector<unsigned long long int>> matrixC;
+
+// Constructs the vector matrices
+// Code from matrix addition example
+void constructMatricies(int dim) {
+    for (int i = 0; i < dim; i++) {
+        matrixA.push_back(vector<unsigned long long int>(dim));
+        matrixB.push_back(vector<unsigned long long int>(dim));
+        matrixC.push_back(vector<unsigned long long int>(dim));
+    }
+}
+
 int main() {
-
-
-
 
     /* Create matricies Mat_A & Mat_B (decimals) with dimensions N x N, where N is an arbitrarily large number.
     * (the wrapup report will likely need evidence of experimenting with multiple N instances) <-- perhaps code could be written where the matricies are re-generated multiple times
@@ -39,39 +54,45 @@ int main() {
      */
 
     matrix_operations m;
-    int dim = 0;
-    int r1, c1, r2, c2;
+
     int userInput;
 
     // get user input into num of rows & columns. weak working solution for now, as input validation not great
-    cout << "How many rows & columns would you like for Matrix A: ";
+    cout << "How many rows & columns would you like for each Matrix?: ";
     cin >> userInput;
     if (cin.fail()) {
         cout << "wasn't an int, exiting process";
         return 0;
     }
     dim = userInput;
+    constructMatricies(dim);
+    
 
-    // Creates arrays for A, B & C
-    int** A = new int*[dim];
-    int** B = new int*[dim];
-    int** C = new int*[dim];
-
-    for (int i = 0; i < dim; i++) {
-        A[i] = new int[dim];
-        C[i] = new int[dim];
-        B[i] = new int[dim];
-    }
-
-    // fill matrix A & B with random integer numbers
-    m.inputMatrix(A, dim);
-    m.inputMatrix(B, dim);
-
-    // Initialize result matrix C to 0
-    // this was generated, not sure if necessary
+    // fills vectors with junk values
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
-            C[i][j] = 0;
+            matrixA[i][j] = rand() % 101;
+            matrixB[i][j] = rand() % 101;
+        }
+    }
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            if (matrixA[i][j] > 100 || matrixA[i][j] < 0) return 1;
+            if (matrixB[i][j] > 100 || matrixB[i][j] < 0) return 1;
+        }
+    }
+
+
+
+    srand((unsigned) time(0));
+    // fill matrix A & B with random integer numbers
+    // m.inputMatrix(A, dim);
+    // m.inputMatrix(B, dim);
+
+    // Initialize result matrix C to 0
+    for (int i = 0; i < dim; i++) {
+        for (int j = 0; j < dim; j++) {
+            matrixC[i][j] = 0;
         }
     }
 
@@ -81,32 +102,29 @@ int main() {
     for (int i = 0; i < dim; i++) {
         for (int j = 0; j < dim; j++) {
             for (int k = 0; k < dim; k++) {
-                C[i][j] += A[i][k] * B[k][j];
+                matrixC[i][j] += matrixA[i][k] * matrixB[k][j];
             }
         }
     }
-
-    // Output result
-    cout << "Resultant Matrix C:\n";
-    for (int i = 0; i < dim; i++) {
-        for (int j = 0; j < dim; j++) {
-            cout << C[i][j] << " ";
-        }
-        cout << endl;
-    }
+    cout << "output matrix A" << endl;
+    m.outputMatrix(matrixA, dim);
+    cout << "output matrix B" << endl;
+    m.outputMatrix(matrixB, dim);
+    cout << "output matrix C" << endl;
+    m.outputMatrix(matrixC, dim);
 
     // Free allocated memory
-    for (int i = 0; i < dim; i++) {
-        delete[] A[i];
-        delete[] C[i];
-    }
-    for (int i = 0; i < dim; i++) {
-        delete[] B[i];
-    }
-
-    delete[] A;
-    delete[] B;
-    delete[] C;
+    // for (int i = 0; i < dim; i++) {
+    //     delete[] A[i];
+    //     delete[] C[i];
+    // }
+    // for (int i = 0; i < dim; i++) {
+    //     delete[] B[i];
+    // }
+    //
+    // delete[] A;
+    // delete[] B;
+    // delete[] C;
 
 
 
